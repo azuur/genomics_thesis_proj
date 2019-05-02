@@ -1,4 +1,2 @@
-# genomics_thesis_proj
-My master's thesis project
-
-This is what I'm working on
+# Comparison and evaluation of gene regulatory network inference algorithms
+This is my thesis project.
