@@ -1,2 +1,2 @@
-# Comparison and evaluation of gene regulatory network inference algorithms
+# Evaluation of GRN inference algorithms
 This is my thesis project.
