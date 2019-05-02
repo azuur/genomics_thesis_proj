@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 /DREAM5_data/
-/Ecoli_data/
-/Scerevisiae_data/
+/EColi_data/
+/SCerevisiae_data/
 /Robjects/
+_Rhistory
