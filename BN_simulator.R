@@ -207,7 +207,7 @@ sim_closure <- function(graph, all_gene_closures){
     if(length(errors) != length(sorted_nodes)){ stop("Need error vector of appropriate length.") }
     vec <- rep(0, length(sorted_nodes))
     for(x in sorted_nodes){
-      vec[x] <- all_gene_cl$closures[[x]](vec, errors)
+      vec[x] <- all_gene_closures$closures[[x]](vec, errors)
     }
     return(vec)
   }

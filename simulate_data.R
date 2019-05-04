@@ -19,7 +19,7 @@ all_g <- all_gene_closures(SC_20,
                               param_list = param_list)
 
 
-simulator1 <- sim_closure(SC_20, sim_info)
+simulator1 <- sim_closure(SC_20, all_g)
 
 errores <- runif(20,-1,1)
 simulator1$f(errores)
