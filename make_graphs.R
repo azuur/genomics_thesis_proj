@@ -103,11 +103,11 @@ EC_200 <- induced_subgraph(EC_net, vids = EC_200)
 
 rm(add_node_marbach,marbach_algo,modularity,i,ini_node,largest_connected_component_EC,largest_connected_component_SC)
 
+# 
+# for(i in ls()){
+#   saveRDS(get(i),here(paste0("Robjects/graph_objects/",i,".RDS")))
+#   #print(i)
+#   #print(components(get(i))$no)
+# }
 
-for(i in ls()){
-  saveRDS(get(i),here(paste0("Robjects/graph_objects/",i,".RDS")))
-  #print(i)
-  #print(components(get(i))$no)
-}
-
-#str_saveobj(ls(), subdir = "Robjects/graph_objects")
+str_saveobj(ls(), subdir = "Robjects/graph_objects")

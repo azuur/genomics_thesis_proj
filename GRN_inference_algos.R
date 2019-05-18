@@ -1,3 +1,5 @@
+install.packages("graph")
+
 #GENIE3
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
