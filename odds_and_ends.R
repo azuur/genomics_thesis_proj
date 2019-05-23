@@ -24,3 +24,39 @@ summary(net)
 
 net_s
 sqrt(dim(net)[1])
+
+
+
+
+#datos_SC <- readxl::read_excel(here("SCerevisiae_data/PLOSONE_Their_database.xlsx"),)
+nombres_replicas_SC <- unlist(datos_SC[,1])
+
+datos_SC <- datos_SC %>% 
+  select(-1) %>%
+  t() %>% 
+  as.data.frame()
+
+datos
+
+datos_SC %>% sapply(FUN = var) %>% summary()
+datos_SC %>% sapply(FUN = var) %>% hist()
+datos_SC %>% sapply(FUN = var) %>% boxplot()
+datos_SC %>% sapply(FUN = mean) %>% summary()
+datos_SC %>% sapply(FUN = mean) %>% hist()
+datos_SC %>% sapply(FUN = mean) %>% boxplot()
+datos_SC %>% sapply(FUN = sd) %>% summary()
+datos_SC %>% sapply(FUN = sd) %>% hist()
+datos_SC %>% sapply(FUN = sd) %>% boxplot()
+datos_SC %>% sapply(FUN = function(x)sd(x)/mean(x)) %>% summary()
+datos_SC %>% sapply(FUN = function(x)sd(x)/mean(x)) %>% hist()
+datos_SC %>% sapply(FUN = function(x)sd(x)/mean(x)) %>% boxplot()
+datos_SC %>% sapply(FUN = function(x)var(x/max(x))) %>% summary()
+datos_SC %>% sapply(FUN = function(x)var(x/max(x))) %>% hist()
+datos_SC %>% sapply(FUN = function(x)var(x/max(x))) %>% boxplot()
+datos_SC %>% sapply(FUN = function(x)sd(x/max(x))/mean(x/max(x))) %>% summary()
+datos_SC %>% sapply(FUN = function(x)sd(x/max(x))/mean(x/max(x))) %>% hist()
+datos_SC %>% sapply(FUN = function(x)sd(x/max(x))/mean(x/max(x))) %>% boxplot()
+
+
+datos_EC %>% apply(MARGIN = 2, FUN = var) %>% summary()
+datos_EC %>% apply(MARGIN = 2, FUN = var) %>% hist()

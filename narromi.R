@@ -1,4 +1,48 @@
-narromi <- function(y, X, lambda, alpha, beta, t){
+NARROMI <- function(X, lambda = 1, alpha = 0.05, beta = 0.05, t = 0.6, cl =NULL){
+
+  if(is.null(cl)){
+    l <- lapply(1:ncol(X),
+                function(i){
+                  res <- narromi(X[,i,drop=F], X[,-i, drop=F], lambda, alpha, beta, t)
+                  net <- split(res$net, 1:length(res$net)<i)
+                  net <- c(net[["TRUE"]],0,net[["FALSE"]])
+                  net_value <- split(res$net_value, 1:length(res$net_value)<i)
+                  net_value <- c(net_value[["TRUE"]],0,net_value[["FALSE"]])
+                  sig <- split(res$sig, 1:length(res$sig)<i)
+                  sig <- c(sig[["TRUE"]],0,sig[["FALSE"]])
+                  return(list(net = net, net_value = net_value, sig = sig))
+                })
+  } else{
+    clusterExport(cl, 
+                  c("X", "lambda", "alpha", "beta", "t"), 
+                  envir = environment()
+                  )
+    
+    clusterExport(cl, 
+                  c("narromi", "narromi_cmi","reoptim","LP_TGN"), 
+                  envir = .GlobalEnv
+    )
+    l <- parLapply(cl,
+                   1:ncol(X),
+                   function(i){
+                     res <- narromi(X[,i,drop=F], X[,-i,drop=F], lambda, alpha, beta, t)
+                     net <- split(res$net, 1:length(res$net)<i)
+                     net <- c(net[["TRUE"]],0,net[["FALSE"]])
+                     net_value <- split(res$net_value, 1:length(res$net_value)<i)
+                     net_value <- c(net_value[["TRUE"]],0,net_value[["FALSE"]])
+                     sig <- split(res$sig, 1:length(res$sig)<i)
+                     sig <- c(sig[["TRUE"]],0,sig[["FALSE"]])
+                     return(list(net = net, net_value = net_value, sig = sig))
+                   })
+  }
+  
+  net <- do.call(rbind, lapply(l, function(x) x$net))
+  net_value <- do.call(rbind, lapply(l, function(x) x$net_value))
+  sig <- do.call(rbind, lapply(l, function(x) x$sig))
+  return(list(net = net, net_value = net_value, sig = sig))
+}
+
+narromi <- function(y, X, lambda = 1, alpha = 0.05, beta = 0.05, t = 0.6){
   net <- matrix(0, nrow = 1, ncol = ncol(X))
   
   net_value <- 
@@ -8,9 +52,9 @@ narromi <- function(y, X, lambda, alpha, beta, t){
     
   idx <- which(abs(G1) >= alpha)
   if( length(idx) == 0){ return(
-    list(net = rep(0,length(y)), net_value = rep(0,length(y)), sig = rep(NA,length(y)))
+    list(net = rep(0,ncol(X)), net_value = rep(0,ncol(X)), sig = rep(NA,ncol(X)))
     )}
-  X1 <- X[,idx]
+  X1 <- X[,idx, drop=F]
   
   J <- reoptim(y, X1, lambda, beta)
   
@@ -69,26 +113,12 @@ reoptim <- function(y, X, lambda, alpha){
     value <-
     matrix(0, ncol = ncol(J), nrow = nrow(J))
   
+  
   idx <- which(abs(J) >= alpha)
   idx_c <- which(abs(J) < alpha)
-  
-  J1 <- LP_TGN(y, X[,idx], lambda)
-  
-  idx1 <- which(abs(J1) >= alpha)
-  idx_c1 <- which(abs(J1) < alpha)
-  
-  old_idx <- idx
-  
-  idx <- old_idx[idx1]
-  idx_c <- old_idx[idx_c1]
-  
-  sparse[idx] <- J1[idx1]
-  sparse[idx_c] <- 0
-  value[idx_c] <- J1[idx_c1]
-  
-  while(length(idx_c) > 0){
+  if(length(idx)>0){
     
-    J1 <- LP_TGN(y, X[,idx], lambda)
+    J1 <- LP_TGN(y, X[,idx, drop=F], lambda)
     
     idx1 <- which(abs(J1) >= alpha)
     idx_c1 <- which(abs(J1) < alpha)
@@ -101,9 +131,27 @@ reoptim <- function(y, X, lambda, alpha){
     sparse[idx] <- J1[idx1]
     sparse[idx_c] <- 0
     value[idx_c] <- J1[idx_c1]
+    
+    while(length(idx_c) > 0){
+      
+      J1 <- LP_TGN(y, X[,idx, drop=F], lambda)
+      
+      idx1 <- which(abs(J1) >= alpha)
+      idx_c1 <- which(abs(J1) < alpha)
+      
+      old_idx <- idx
+      
+      idx <- old_idx[idx1]
+      idx_c <- old_idx[idx_c1]
+      
+      sparse[idx] <- J1[idx1]
+      sparse[idx_c] <- 0
+      value[idx_c] <- J1[idx_c1]
+    }
+    
+    value <- value + sparse
   }
   
-  value <- value + sparse
   
   return(list(sparse = sparse, value = value))
 }
@@ -113,6 +161,8 @@ reoptim <- function(y, X, lambda, alpha){
 #THAT WAS THE MISTAKE WITH OUR PREVIOUS VERSION OF NARROMI...
 #ALSO... LP_TGN is 4-6 times faster than MTE::LADLasso
 LP_TGN <- function(Y, X, lambda){
+  
+  if(ncol(X)==0){stop("Empty X matrix provided.")}
   
   if( is.matrix(Y) ){ reps = ncol(Y) } else{ reps = 1 }
 

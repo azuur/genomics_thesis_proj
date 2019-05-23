@@ -96,8 +96,8 @@ one_gene_closure <- function(x, edges, functional_form, params = NULL){
     }
     
     reg_x <- function(vec,errors){ 
-      v <- sum(coefficients*vec[parents_x]) + errors[x]
-      1/(1+ exp(-v))
+      v <- sum(coefficients*vec[parents_x])
+      (2/(1+ exp(-v))-1)  + errors[x]
     }
     
     metadata <- list(functional_form = functional_form, 
