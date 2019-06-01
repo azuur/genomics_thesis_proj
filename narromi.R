@@ -123,6 +123,8 @@ reoptim <- function(y, X, lambda, alpha){
     idx1 <- which(abs(J1) >= alpha)
     idx_c1 <- which(abs(J1) < alpha)
     
+    #if(length(idx1)==0){break}
+    
     old_idx <- idx
     
     idx <- old_idx[idx1]
@@ -132,7 +134,7 @@ reoptim <- function(y, X, lambda, alpha){
     sparse[idx_c] <- 0
     value[idx_c] <- J1[idx_c1]
     
-    while(length(idx_c) > 0){
+    while(length(idx_c) > 0 & length(idx1) > 0){
       
       J1 <- LP_TGN(y, X[,idx, drop=F], lambda)
       
@@ -185,7 +187,24 @@ LP_TGN <- function(Y, X, lambda){
   
   symb <- c(rep("==", length(Y)),rep(">=", n_aux_vars))
   
-  x <- Rglpk::Rglpk_solve_LP(obj = f, mat = A, dir = symb, rhs = b)
+  x <- Rglpk::Rglpk_solve_LP(obj = f, mat = A, dir = symb, rhs = b,
+                             control = list("tm_limit" = 60*1e3))
+  
+  if(x$status > 0){
+    if(is.matrix(Y)){
+      if(ncol(Y) > 1){
+        warning("Optimal solution not found with GLPK solver. Returning 0 vector.")
+        x$solution[-c( 1:(2*length(Y)) )] <- 0
+      } else{ Y <- c(Y) }
+    }
+    warning("Optimal solution not found with GLPK solver. Used MTE::LADlasso.")
+    x$solution[-c( 1:(2*length(Y)) )] <- MTE::LADlasso(
+      Y, 
+      X, 
+      rep(1,ncol(X)), 
+      lambda = lambda/nrow(X),
+      adaptive = F)$beta
+  }
 
   res <- x$solution[-c( 1:(2*length(Y)) )]
   res <- res[1:(length(res)/2)] + res[(length(res)/2 + 1):length(res)]

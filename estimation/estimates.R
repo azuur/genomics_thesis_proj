@@ -8,11 +8,16 @@ source("narromi.R")
 
 
 graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
-  "SC_10","SC_20","SC_50","SC_200")
-type_options <- c("linear","sigmoid")
-noise_options <- c("uniform","gaussian")
-r_options <- c(0.2,0.5,0.8)
-sample_size_options <- c(20, 50, 100, 1000)
+  #"SC_10","SC_20",
+  #"SC_50"),
+  "SC_200")
+type_options <- c("linear",
+                  "sigmoid")
+noise_options <- c("uniform",
+                   "gaussian")
+r_options <- c(0.2,0.5,#
+  0.8)
+sample_size_options <- c(20)#, 50, 100, 1000)
 n_sim <- 1e3
 
 algoritmos <- list(
@@ -40,11 +45,11 @@ algoritmos <- list(
 )
 
 
-netw_str <- graph_options[1]
-type <- type_options[1]
-noise <- noise_options[1]
-r <- r_options[1]
-sample_size <- sample_size_options[1]
+# netw_str <- graph_options[1]
+# type <- type_options[1]
+# noise <- noise_options[1]
+# r <- r_options[1]
+# sample_size <- sample_size_options[1]
 
 for(sample_size in sample_size_options){
   
@@ -99,8 +104,6 @@ for(sample_size in sample_size_options){
             dat <- readRDS(file = file.path(data_path,paste0("sim",i,".RDS")))
             
             
-            
-            
             algo_times$times_mi_splines <- system.time(
               assign(paste0("mi_splines",i),value = algoritmos$mi_splines(dat))
             )
@@ -134,6 +137,7 @@ for(sample_size in sample_size_options){
             algo_times$times_TIGRESS <- system.time(
               assign(paste0("TIGRESS",i),value = algoritmos$TIGRESS(dat))
             )
+
             
             
             for(alg in seq_along(algoritmos)){
@@ -146,7 +150,12 @@ for(sample_size in sample_size_options){
               )            
               }
             
-            
+            rm(list=paste0(c("mi_splines","MRNET_splines",
+                             "CLR_splines","ARACNE_splines",
+                             "mi_mm","MRNET_mm",
+                             "CLR_mm","ARACNE_mm",
+                             "NARROMI","GENIE3",
+                             "TIGRESS"),i))
           }
           saveRDS(algo_times,file.path(estimates_path,"times.RDS"))
           

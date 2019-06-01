@@ -2,6 +2,7 @@ require(here)
 require(tidyverse)
 require(magrittr)
 require(igraph)
+require(digest)
 
 
 filelist <- function(subdir = "Robjects"){
@@ -91,6 +92,6 @@ calibrate_variances <- function(graph, W, r = 0.5, ini_var = 1, type = "linear")
 make.seed <- function(x) {
   require("digest")
   hexval <- paste0("0x",digest(x,"crc32"))
-  intval <- type.convert(hexval) %% .Machine$integer.max
+  intval <- type.convert(hexval) %% 2147483647#.Machine$integer.max
   intval
 }

@@ -16,8 +16,8 @@ graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
 type_options <- c("linear","sigmoid")
 noise_options <- c("uniform","gaussian")
 r_options <- c(0.2,0.5,0.8)
-sample_size_options <- c(20, 50, 100, 1000)
-n_sim <- 1e3
+sample_size_options <- c(20, 50, 100, 500)
+n_sim <- 5e3
 
 
 
@@ -44,7 +44,6 @@ for(sample_size in sample_size_options){
           print(paste0("r=",r))
           
           {
-            require(digest)
             seed <- make.seed(paste0(sample_size,netw_str,type,noise,r))
             str_readobj(netw_str,"Robjects/graph_objects")
             netw <- get(netw_str)
@@ -96,7 +95,7 @@ for(sample_size in sample_size_options){
             
             cl <- parallel::makeForkCluster(3)
             doParallel::registerDoParallel(cl)
-            clusterSetRNGStream(cl = cl, semilla)
+            parallel::clusterSetRNGStream(cl = cl, semilla)
             
             foreach(i = 1:n_sim) %dopar% {
               # semilla <- 3.7*semilla*(1-semilla)
