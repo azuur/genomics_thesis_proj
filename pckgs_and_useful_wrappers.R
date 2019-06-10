@@ -5,6 +5,8 @@ require(igraph)
 require(digest)
 
 
+
+
 filelist <- function(subdir = "Robjects"){
   if(require(here)){
     str <- list.files(path = here::here(subdir), pattern = ".RDS", ignore.case = T)

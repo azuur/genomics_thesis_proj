@@ -7,17 +7,19 @@ source("narromi.R")
 
 
 
-graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
-  #"SC_10","SC_20",
-  #"SC_50"),
-  "SC_200")
-type_options <- c("linear",
-                  "sigmoid")
-noise_options <- c("uniform",
-                   "gaussian")
-r_options <- c(0.2,0.5,#
-  0.8)
-sample_size_options <- c(20)#, 50, 100, 1000)
+# graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
+#   "SC_10","SC_20",
+#   "SC_50")#,
+#   #"SC_200")
+# type_options <- c("linear",
+#                   "sigmoid")
+# noise_options <- c("uniform",
+#                    "gaussian")
+# r_options <- c(0.2,0.5,
+#   0.8)
+# sample_size_options <- c(
+#   #20),
+#   50, 100, 1000)
 n_sim <- 1e3
 
 algoritmos <- list(
@@ -100,7 +102,7 @@ for(sample_size in sample_size_options){
             times_GENIE3 = rep(as.numeric(NA), n_sim),
             times_TIGRESS = rep(as.numeric(NA), n_sim))
           
-          for(i in 1:n_sim){
+          for(i in 725:n_sim){
             dat <- readRDS(file = file.path(data_path,paste0("sim",i,".RDS")))
             
             

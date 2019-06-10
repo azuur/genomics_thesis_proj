@@ -1,5 +1,30 @@
 #source("simulate_data/simulate_data_SC.R")
+
+
+# graph_options <- c("SC_20")
+# type_options <- c("sigmoid")
+# noise_options <- c("gaussian")
+# r_options <- c(0.8)
+# sample_size_options <- c(100)
+# source("estimation/estimates.R")
+
+
+
+graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
+  #"SC_10","SC_20",
+  "SC_50")#,
+#"SC_200")
+type_options <- c("linear",
+                  "sigmoid")
+noise_options <- c("uniform",
+                   "gaussian")
+r_options <- c(0.2,0.5,
+               0.8)
+sample_size_options <- c(500)
+#n_sim <- 1e3
 source("estimation/estimates.R")
+
+
 
 # X=dat; lambda = 1; alpha = 0.05; beta = 0.05; t = 0.6; cl =NULL
 
