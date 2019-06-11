@@ -102,7 +102,7 @@ for(sample_size in sample_size_options){
             times_GENIE3 = rep(as.numeric(NA), n_sim),
             times_TIGRESS = rep(as.numeric(NA), n_sim))
           
-          for(i in 725:n_sim){
+          for(i in first_iteration:n_sim){
             dat <- readRDS(file = file.path(data_path,paste0("sim",i,".RDS")))
             
             
