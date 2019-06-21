@@ -1,20 +1,23 @@
 require(here)
 source("pckgs_and_useful_wrappers.R")
+require(precrec)
 
 graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
-  #"SC_10","SC_20",
+  "SC_10","SC_20",
   "SC_50")#,
 #"SC_200")
-type_options <- c(#"linear",
+type_options <- c("linear",
   "sigmoid")
-noise_options <- c("uniform"#,
-                   #"gaussian"
+noise_options <- c("uniform",
+                   "gaussian"
                    )
-r_options <- c(0.2#,0.5,
-               #0.8
+r_options <- c(0.2,0.5,
+               0.8
                )
-sample_size_options <- c(20#, 
-                         #50, 100, 500
+sample_size_options <- c(#20, 
+                         #50, 
+                         #100, 
+                         500
                          )
 n_sim <- 1e3
 
@@ -49,49 +52,106 @@ algoritmos <- list(
 # r <- r_options[1]
 # sample_size <- sample_size_options[1]
 
-sample_size <- sample_size_options[1]
-netw_str <- graph_options[1]
-type <- type_options[1]
-noise <- noise_options[1]
-r <- r_options[1]
-alg <- seq_along(algoritmos)[6]
-
-i <- 1
 
 
+for(sample_size in sample_size_options){
 
-estimates_path <- file.path("/media","adrian","bodega","thesis",
-                            "Robjects","estimates",
-                            netw_str,
-                            type,
-                            paste0(noise,"_noise"),
-                            paste0(r,"_noise_to_sig"),
-                            paste0("sample_size_",sample_size)
-)
-readRDS(file = paste0(file.path(estimates_path,
-                                names(algoritmos)[alg],
-                                names(algoritmos)[alg]),
-                      i,".RDS")
-)
-# 
-# for(sample_size in sample_size_options){
-#   
-#   for(netw_str in graph_options){
-#     
-#     for(type in type_options){
-#       
-#       for(noise in noise_options){
-#         
-#         for(r in r_options){
-#           
-#           for(alg in seq_along(algoritmos)){
-#             
-#                         
-#           }
-#         }
-#       }
-#     }
-#   }
-# }
-# 
-#           
+  for(netw_str in graph_options){
+
+    for(type in type_options){
+
+      for(noise in noise_options){
+
+        for(r in r_options){
+
+          for(alg in seq_along(algoritmos)){
+            
+            data_path <- file.path("/media","adrian","bodega","thesis",
+                                   "Robjects","simulated_data",
+                                   netw_str,
+                                   type,
+                                   paste0(noise,"_noise"),
+                                   paste0(r,"_noise_to_sig"),
+                                   paste0("sample_size_",sample_size)
+            )
+            
+            estimates_path <- file.path("/media","adrian","bodega","thesis",
+                                        "Robjects","estimates",
+                                        netw_str,
+                                        type,
+                                        paste0(noise,"_noise"),
+                                        paste0(r,"_noise_to_sig"),
+                                        paste0("sample_size_",sample_size)
+            )
+            
+            
+            
+            
+            net <- readRDS(file = paste0(file.path(estimates_path,
+                                                   names(algoritmos)[alg],
+                                                   names(algoritmos)[alg]),
+                                         1,".RDS")
+                           )
+            net[] <- 0
+            
+            if(names(algoritmos)[alg] == "NARROMI"){
+              net <- net$net
+            }
+            if(names(algoritmos)[alg] == "TIGRESS"){
+              net <- net[[length(net)]]
+            }
+            
+            dat <- readRDS(file = file.path(data_path,paste0("sim",i,".RDS")))
+            
+            ord <- order(as.numeric(gsub("X","",colnames(dat))))
+                           
+            
+            for(i in 1:n_sim){
+              
+              estimates_path <- file.path("/media","adrian","bodega","thesis",
+                                          "Robjects","estimates",
+                                          netw_str,
+                                          type,
+                                          paste0(noise,"_noise"),
+                                          paste0(r,"_noise_to_sig"),
+                                          paste0("sample_size_",sample_size)
+              )
+              
+              cur <- readRDS(file = paste0(file.path(estimates_path,
+                                                     names(algoritmos)[alg],
+                                                     names(algoritmos)[alg]),
+                                           i,".RDS"))
+              if(names(algoritmos)[alg] == "NARROMI"){
+                cur <- cur$net
+              }
+              if(names(algoritmos)[alg] == "TIGRESS"){
+                cur <- cur[[length(cur)]]
+              }
+              
+              net <- net + cur
+            
+            }
+            
+            probabilities_path <- file.path("/media","adrian","bodega","thesis",
+                                        "Robjects","analysis",
+                                        netw_str,
+                                        type,
+                                        paste0(noise,"_noise"),
+                                        paste0(r,"_noise_to_sig"),
+                                        paste0("sample_size_",sample_size)
+            )
+            dir.create(file.path(probabilities_path,names(algoritmos)[alg]), showWarnings = T, recursive = T)
+            
+            
+            net <- net/n_sim
+            
+            net <- net[ord,ord]
+            
+            saveRDS(net,file.path(probabilities_path,names(algoritmos)[alg],"probabilities.RDS"))
+            
+          }
+        }
+      }
+    }
+  }
+}
