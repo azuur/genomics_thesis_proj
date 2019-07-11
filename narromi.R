@@ -9,7 +9,7 @@ NARROMI <- function(X, lambda = 1, alpha = 0.05, beta = 0.05, t = 0.6, cl =NULL)
                   net_value <- split(res$net_value, 1:length(res$net_value)<i)
                   net_value <- c(net_value[["TRUE"]],0,net_value[["FALSE"]])
                   sig <- split(res$sig, 1:length(res$sig)<i)
-                  sig <- c(sig[["TRUE"]],0,sig[["FALSE"]])
+                  sig <- c(sig[["TRUE"]],NA,sig[["FALSE"]])
                   return(list(net = net, net_value = net_value, sig = sig))
                 })
   } else{
@@ -39,6 +39,8 @@ NARROMI <- function(X, lambda = 1, alpha = 0.05, beta = 0.05, t = 0.6, cl =NULL)
   net <- do.call(rbind, lapply(l, function(x) x$net))
   net_value <- do.call(rbind, lapply(l, function(x) x$net_value))
   sig <- do.call(rbind, lapply(l, function(x) x$sig))
+  colnames(net) <- colnames(net_value) <- colnames(sig) <- colnames(X)
+  rownames(net) <- rownames(net_value) <- rownames(sig) <- rownames(X)
   return(list(net = net, net_value = net_value, sig = sig))
 }
 

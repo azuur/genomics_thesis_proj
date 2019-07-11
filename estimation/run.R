@@ -18,61 +18,248 @@
 
 rm(list=ls())
 
-first_iteration<-1
+# 
+# graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
+#   #"SC_10","SC_20",
+#   "SC_50")#,
+# #"SC_200")
+# type_options <- c("linear",
+#                   "sigmoid")
+# noise_options <- c("uniform",
+#                    "gaussian")
+# r_options <- c(0.2,0.5,
+#                0.8)
+# sample_size_options <- c(100)
+# #n_sim <- 1e3
+# source("estimation/estimates.R")
+
+
+
 graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
-  #"SC_10","SC_20",
+  "SC_10","SC_20",
   "SC_50")#,
 #"SC_200")
 type_options <- c("linear",
                   "sigmoid")
 noise_options <- c("uniform",
                    "gaussian")
-r_options <- c(0.2,0.5,
+
+r_options <- c(0.2,
+               0.5,
                0.8)
-sample_size_options <- c(100)
-#n_sim <- 1e3
-source("estimation/estimates.R")
+sample_size_options <- c(20, 
+                         50, 
+                         100, 
+                         500)
+
+n_sim <- 1e3
+
+
+algoritmos <- list(
+  mi_splines = function(x){
+    ord <- min(as.integer(nrow(x)^(1/3)),4)
+    fastGeneMI::get.mim.bspline(x, 
+                                order = ord, 
+                                n.cores = 5)
+  },
+  mi_mm = function(x)fastGeneMI::get.mim.MM(x,discretisation = "equalwidth", n.cores = 5),
+  MRNET_splines = minet::mrnet,
+  CLR_splines = parmigene::clr,
+  ARACNE_splines = parmigene::aracne.a,
+  MRNET_mm = minet::mrnet,
+  CLR_mm = parmigene::clr,
+  ARACNE_mm = parmigene::aracne.a,
+  NARROMI = function(x){
+    cl <- makeCluster(5)
+    res <- NARROMI(x, cl = cl)
+    stopCluster(cl)
+    rm(cl)
+    res},
+  GENIE3 = function(x)GENIE3::GENIE3(exprMatrix = t(x),nCores = 5),
+  TIGRESS = function(x)tigress::tigress(expdata = x, usemulticore = T)
+)
+source("analysis/curves.R")
 
 
 
-# X=dat; lambda = 1; alpha = 0.05; beta = 0.05; t = 0.6; cl =NULL
 
-# 
-# j<-9
-#  res <- narromi(X[,j,drop=F], X[,-j,drop=F], lambda, alpha, beta, t)
-# # net <- split(res$net, 1:length(res$net)<j)
-# # net <- c(net[["TRUE"]],0,net[["FALSE"]])
-# # net_value <- split(res$net_value, 1:length(res$net_value)<j)
-# # net_value <- c(net_value[["TRUE"]],0,net_value[["FALSE"]])
-# # sig <- split(res$sig, 1:length(res$sig)<j)
-# # sig <- c(sig[["TRUE"]],0,sig[["FALSE"]])
-# 
-# 
-# y = X[,j]; X = X[,-j,drop=F]
-# net_value <- 
-#   G1 <- 
-#   apply(X = X, MARGIN = 2, FUN = function(x) narromi_cmi(x,y))
-# #    apply(X = X, MARGIN = 2, FUN = function(x) infotheo::mutinformation(x,y))
-# 
-# idx <- which(abs(G1) >= alpha)
-# X<-X[,idx, drop=F]
-# 
-# ini_B <- lm(y~ -1+X)$coefficients
-# ini_B[is.na(ini_B)] <- 0.004
-# ini_B <- rep(1, ncol(X))
-# MTE::LADlasso(y,X,
-#          ini_B,
-#          lambda = lambda/nrow(X))
-# LP_TGN(y,X,lambda)
-# 
-# 
-# 
-# 
-# if(T){
-#   if(T){
-#     if(F){
-#       print("pipi")
-#     } else{ next }
-#   }
-#   print("popo")
-# }
+
+
+
+
+
+
+
+
+
+
+graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
+  #"SC_10","SC_20",
+  #"SC_50")#,
+  "SC_200")
+type_options <- c("linear",
+                  "sigmoid")
+noise_options <- c("uniform",
+                   "gaussian")
+
+r_options <- c(0.2,
+               0.5,
+               0.8)
+sample_size_options <- c(20)#, 
+                         #50, 
+                         #100, 
+                         #500)
+
+n_sim <- 1e3
+
+
+algoritmos <- list(
+  mi_splines = function(x){
+    ord <- min(as.integer(nrow(x)^(1/3)),4)
+    fastGeneMI::get.mim.bspline(x, 
+                                order = ord, 
+                                n.cores = 5)
+  },
+  mi_mm = function(x)fastGeneMI::get.mim.MM(x,discretisation = "equalwidth", n.cores = 5),
+  MRNET_splines = minet::mrnet,
+  CLR_splines = parmigene::clr,
+  ARACNE_splines = parmigene::aracne.a,
+  MRNET_mm = minet::mrnet,
+  CLR_mm = parmigene::clr,
+  ARACNE_mm = parmigene::aracne.a,
+  NARROMI = function(x){
+    cl <- makeCluster(5)
+    res <- NARROMI(x, cl = cl)
+    stopCluster(cl)
+    rm(cl)
+    res},
+  GENIE3 = function(x)GENIE3::GENIE3(exprMatrix = t(x),nCores = 5),
+  TIGRESS = function(x)tigress::tigress(expdata = x, usemulticore = T)
+)
+source("analysis/curves.R")
+
+rm(list=ls())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
+  "SC_10","SC_20",
+  "SC_50")#,
+#"SC_200")
+type_options <- c("linear",
+                  "sigmoid")
+noise_options <- c("uniform",
+                   "gaussian")
+
+r_options <- c(0.2,
+               0.5,
+               0.8)
+sample_size_options <- c(20, 
+                         50, 
+                         100, 
+                         500)
+
+n_sim <- 1e3
+
+
+algoritmos <- list(
+  mi_splines = function(x){
+    ord <- min(as.integer(nrow(x)^(1/3)),4)
+    fastGeneMI::get.mim.bspline(x, 
+                                order = ord, 
+                                n.cores = 5)
+  },
+  mi_mm = function(x)fastGeneMI::get.mim.MM(x,discretisation = "equalwidth", n.cores = 5),
+  MRNET_splines = minet::mrnet,
+  CLR_splines = parmigene::clr,
+  ARACNE_splines = parmigene::aracne.a,
+  MRNET_mm = minet::mrnet,
+  CLR_mm = parmigene::clr,
+  ARACNE_mm = parmigene::aracne.a,
+  NARROMI = function(x){
+    cl <- makeCluster(5)
+    res <- NARROMI(x, cl = cl)
+    stopCluster(cl)
+    rm(cl)
+    res},
+  GENIE3 = function(x)GENIE3::GENIE3(exprMatrix = t(x),nCores = 5),
+  TIGRESS = function(x)tigress::tigress(expdata = x, usemulticore = T)
+)
+source("analysis/inferred_nets.R")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
+  #"SC_10","SC_20",
+  #"SC_50")#,
+  "SC_200")
+type_options <- c("linear",
+                  "sigmoid")
+noise_options <- c("uniform",
+                   "gaussian")
+
+r_options <- c(0.2,
+               0.5,
+               0.8)
+sample_size_options <- c(20)#, 
+#50, 
+#100, 
+#500)
+
+n_sim <- 1e3
+
+
+algoritmos <- list(
+  mi_splines = function(x){
+    ord <- min(as.integer(nrow(x)^(1/3)),4)
+    fastGeneMI::get.mim.bspline(x, 
+                                order = ord, 
+                                n.cores = 5)
+  },
+  mi_mm = function(x)fastGeneMI::get.mim.MM(x,discretisation = "equalwidth", n.cores = 5),
+  MRNET_splines = minet::mrnet,
+  CLR_splines = parmigene::clr,
+  ARACNE_splines = parmigene::aracne.a,
+  MRNET_mm = minet::mrnet,
+  CLR_mm = parmigene::clr,
+  ARACNE_mm = parmigene::aracne.a,
+  NARROMI = function(x){
+    cl <- makeCluster(5)
+    res <- NARROMI(x, cl = cl)
+    stopCluster(cl)
+    rm(cl)
+    res},
+  GENIE3 = function(x)GENIE3::GENIE3(exprMatrix = t(x),nCores = 5),
+  TIGRESS = function(x)tigress::tigress(expdata = x, usemulticore = T)
+)
+source("analysis/inferred_nets.R")

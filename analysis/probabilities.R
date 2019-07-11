@@ -3,35 +3,38 @@ source("pckgs_and_useful_wrappers.R")
 require(precrec)
 
 graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
-  "SC_10","SC_20",
+  #"SC_10","SC_20",
   "SC_50")#,
 #"SC_200")
-type_options <- c("linear",
-  "sigmoid")
-noise_options <- c("uniform",
-                   "gaussian"
-                   )
-r_options <- c(0.2,0.5,
-               0.8
-               )
-sample_size_options <- c(#20, 
-                         #50, 
-                         #100, 
+type_options <- c("linear"#,
+                  #"sigmoid"
+)
+noise_options <- c("uniform"#,
+  #"gaussian"
+  )
+
+r_options <- c(0.2,
+               #0.5,
+               0.8)
+sample_size_options <- c(20,
+                         50,
+                         100,
                          500
-                         )
+)
+
 n_sim <- 1e3
 
 algoritmos <- list(
-  mi_splines = function(x){
-    ord <- min(as.integer(nrow(x)^(1/3)),4)
-    fastGeneMI::get.mim.bspline(x, 
-                                order = ord, 
-                                n.cores = 5)
-  },
+  # mi_splines = function(x){
+  #   ord <- min(as.integer(nrow(x)^(1/3)),4)
+  #   fastGeneMI::get.mim.bspline(x, 
+  #                               order = ord, 
+  #                               n.cores = 5)
+  # },
   mi_mm = function(x)fastGeneMI::get.mim.MM(x,discretisation = "equalwidth", n.cores = 5),
-  MRNET_splines = minet::mrnet,
-  CLR_splines = parmigene::clr,
-  ARACNE_splines = parmigene::aracne.a,
+  # MRNET_splines = minet::mrnet,
+  # CLR_splines = parmigene::clr,
+  # ARACNE_splines = parmigene::aracne.a,
   MRNET_mm = minet::mrnet,
   CLR_mm = parmigene::clr,
   ARACNE_mm = parmigene::aracne.a,
@@ -46,6 +49,7 @@ algoritmos <- list(
 )
 
 
+
 # netw_str <- graph_options[1]
 # type <- type_options[1]
 # noise <- noise_options[1]
@@ -55,15 +59,15 @@ algoritmos <- list(
 
 
 for(sample_size in sample_size_options){
-
+  
   for(netw_str in graph_options){
-
+    
     for(type in type_options){
-
+      
       for(noise in noise_options){
-
+        
         for(r in r_options){
-
+          #alg <- 10
           for(alg in seq_along(algoritmos)){
             
             data_path <- file.path("/media","adrian","bodega","thesis",
@@ -91,7 +95,7 @@ for(sample_size in sample_size_options){
                                                    names(algoritmos)[alg],
                                                    names(algoritmos)[alg]),
                                          1,".RDS")
-                           )
+            )
             net[] <- 0
             
             if(names(algoritmos)[alg] == "NARROMI"){
@@ -100,11 +104,11 @@ for(sample_size in sample_size_options){
             if(names(algoritmos)[alg] == "TIGRESS"){
               net <- net[[length(net)]]
             }
-            
-            dat <- readRDS(file = file.path(data_path,paste0("sim",i,".RDS")))
+
+            dat <- readRDS(file = file.path(data_path,paste0("sim1.RDS")))
             
             ord <- order(as.numeric(gsub("X","",colnames(dat))))
-                           
+            
             
             for(i in 1:n_sim){
               
@@ -122,23 +126,26 @@ for(sample_size in sample_size_options){
                                                      names(algoritmos)[alg]),
                                            i,".RDS"))
               if(names(algoritmos)[alg] == "NARROMI"){
-                cur <- cur$net
+                cur <- cur$sig
               }
               if(names(algoritmos)[alg] == "TIGRESS"){
                 cur <- cur[[length(cur)]]
               }
+              if(names(algoritmos)[alg] == "GENIE3"){
+                ord <- order(as.numeric(gsub("X","",colnames(cur))))
+              }
               
               net <- net + cur
-            
+              
             }
             
             probabilities_path <- file.path("/media","adrian","bodega","thesis",
-                                        "Robjects","analysis",
-                                        netw_str,
-                                        type,
-                                        paste0(noise,"_noise"),
-                                        paste0(r,"_noise_to_sig"),
-                                        paste0("sample_size_",sample_size)
+                                            "Robjects","analysis","avg_scores",
+                                            netw_str,
+                                            type,
+                                            paste0(noise,"_noise"),
+                                            paste0(r,"_noise_to_sig"),
+                                            paste0("sample_size_",sample_size)
             )
             dir.create(file.path(probabilities_path,names(algoritmos)[alg]), showWarnings = T, recursive = T)
             

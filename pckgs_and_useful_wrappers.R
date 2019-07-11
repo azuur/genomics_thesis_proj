@@ -68,7 +68,7 @@ calibrate_variances <- function(graph, W, r = 0.5, ini_var = 1, type = "linear")
     for(x in ord){
       parents_x <- edges[edges[,2]==x,1]
       if(length(parents_x)>0){
-        B_inv <- solve(diag(n)-W)
+        B_inv <- solve(diag(nrow(W))-W)
         vs[x] <- (r/(1-r))*(W[x,parents_x]%*%
                               (B_inv%*%diag(vs)%*%t(B_inv))[parents_x,parents_x]%*%
                               W[x,parents_x])
@@ -78,7 +78,7 @@ calibrate_variances <- function(graph, W, r = 0.5, ini_var = 1, type = "linear")
     for(x in ord){
       parents_x <- edges[edges[,2]==x,1]
       if(length(parents_x)>0){
-        B_inv <- solve(diag(n)-W/2)
+        B_inv <- solve(diag(nrow(W))-W/2)
         vs[x] <- (1/4)*(r/(1-r))*(W[x,parents_x]%*%
                                     (B_inv%*%diag(vs)%*%t(B_inv))[parents_x,parents_x]%*%
                                     W[x,parents_x])

@@ -2,15 +2,16 @@ require(here)
 source("pckgs_and_useful_wrappers.R")
 require(precrec)
 
+
 graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
   #"SC_10","SC_20",
   "SC_50")#,
-  #"SC_200")
+#"SC_200")
 type_options <- c("linear"#,
                   #"sigmoid"
-                  )
+)
 noise_options <- c("uniform",
-                   "gaussian"
+  "gaussian"
   )
 
 r_options <- c(0.2,
@@ -50,15 +51,12 @@ algoritmos <- list(
 
 
 
-
-# netw_str <- graph_options[1]
-# type <- type_options[1]
+# netw_str <- graph_options[3]
+# type <- type_options[2]
 # noise <- noise_options[1]
 # r <- r_options[2]
 # sample_size <- sample_size_options[1]
-# alg <- 5
-# i <- 1
-
+# alg <- 11
 
 for(sample_size in sample_size_options){
   
@@ -68,9 +66,9 @@ for(sample_size in sample_size_options){
     
     A <- get.adjacency(netw, type = "both")
     
-    A <- as.matrix(A) + t(as.matrix(A))
-    
     A_vec <- as.logical(A)
+    
+    GS_density <- sum(A_vec)/length(A_vec)
     
     
     for(type in type_options){
@@ -92,10 +90,12 @@ for(sample_size in sample_size_options){
           
           ord <- order(as.numeric(gsub("X","",colnames(dat))))
           
-          alg <- 7
-          #or(alg in seq_along(algoritmos)){
-            
-            list_of_curves <- list()
+          for(alg in seq_along(algoritmos)){
+            #alg <- 7
+
+          
+            q90_nets <- list()
+            GS_density_nets <- list()
             
             for(i in 1:n_sim){
               
@@ -117,12 +117,12 @@ for(sample_size in sample_size_options){
                   (1e-10 + 
                      (ifelse(is.na(cur$sig), max(cur$sig,na.rm = T), cur$sig) %>%
                         `diag<-`(Inf))
-                  )
+                   )
               }
               if(names(algoritmos)[alg] == "TIGRESS"){
                 cur <- cur[[length(cur)]]
-                #print("HEYEYEYEYA")
               }
+              
               if(names(algoritmos)[alg] == "GENIE3"){
                 ord <- order(as.numeric(gsub("X","",colnames(cur))))
               }
@@ -130,62 +130,42 @@ for(sample_size in sample_size_options){
               cur <- cur[ord,ord]
               
               #cur <- cur + t(cur)
-              cur <- abs(cur)
-              cur <- pmax(cur,t(cur))
               
               diag(cur) <- 0
               
-              alg_m_vec <- c(cur)
-              alg_m_vec <- alg_m_vec/(max(alg_m_vec)+1e-10)
+              # thr90 <- quantile(abs(cur), 0.9)
+              # thrdens <- quantile(abs(cur), 1-GS_density)
+
+              thr90 <- abs(cur)[
+                order(abs(cur),decreasing = T,na.last = T)[round(0.1*length(A_vec))]
+                ] 
+              thrdens <- abs(cur)[
+                order(abs(cur),decreasing = T,na.last = T)[sum(A_vec)+1]
+                ]              
+                 
+              thr90 <- min(max(thr90,1e-10),1-1e-10)
+              thrdens <- min(max(thrdens,1e-10),1-1e-10)   
               
-              list_of_curves[[i]] <- precrec::evalmod(scores = alg_m_vec, labels = as.numeric(A_vec))
-              
+              q90_nets[[i]] <- 2*(abs(cur) >= thr90) + t(abs(cur) >= thr90)
+              GS_density_nets[[i]] <- 2*(abs(cur) >= thrdens) + t(abs(cur) >= thrdens)
               
             }
             
-            roc_path <- file.path("/media","adrian","bodega","thesis",
-                                            "Robjects","analysis","ROC_curves",
-                                            netw_str,
-                                            type,
-                                            paste0(noise,"_noise"),
-                                            paste0(r,"_noise_to_sig"),
-                                            paste0("sample_size_",sample_size)
+            nets_path <- file.path("/media","adrian","bodega","thesis",
+                                  "Robjects","analysis","thresholded_nets",
+                                  netw_str,
+                                  type,
+                                  paste0(noise,"_noise"),
+                                  paste0(r,"_noise_to_sig"),
+                                  paste0("sample_size_",sample_size)
             )
             
-            dir.create(file.path(roc_path,names(algoritmos)[alg],"curves"), showWarnings = T, recursive = T)
-            saveRDS(list_of_curves,file.path(roc_path,names(algoritmos)[alg],"list_of_curves.RDS"))
-            
-            rm(list_of_curves)
-            
+            dir.create(file.path(nets_path,names(algoritmos)[alg]), showWarnings = T, recursive = T)
+            saveRDS(q90_nets,file.path(nets_path,names(algoritmos)[alg],"q90_nets.RDS"))
+            saveRDS(GS_density_nets,file.path(nets_path,names(algoritmos)[alg],"GS_density_nets.RDS"))
             
             
-            probabilities_path <- file.path("/media","adrian","bodega","thesis",
-                                            "Robjects","analysis","avg_scores",
-                                            netw_str,
-                                            type,
-                                            paste0(noise,"_noise"),
-                                            paste0(r,"_noise_to_sig"),
-                                            paste0("sample_size_",sample_size)
-            )
-            
-            alg_avg <- readRDS(file.path(probabilities_path,names(algoritmos)[alg],"probabilities.RDS"))
-            alg_avg <- abs(alg_avg)
-            alg_avg <- pmax(alg_avg,t(alg_avg))
-            
-            diag(alg_avg) <- 0
-            
-            # alg_m_vec <- alg_m_vec/(max(alg_m_vec)+1e-10)
-            
-            alg_avg_vec <- c(alg_avg)
-            alg_avg_vec <- alg_avg_vec/(max(alg_avg_vec)+1e-10)
-            
-            curve_avg <- precrec::evalmod(scores = alg_avg_vec, labels = as.numeric(A_vec))
-            
-            saveRDS(curve_avg,file.path(roc_path,names(algoritmos)[alg],"curve_avg.RDS"))
-            
-            rm(curve_avg)
-            
-          #}
+          }
         }
       }
     }
