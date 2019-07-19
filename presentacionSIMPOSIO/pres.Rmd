@@ -24,7 +24,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ## What We Are Modeling
 
 ```{r, out.width = "1500px"}
-knitr::include_graphics("image1.png")
+knitr::include_graphics("Image1.png")
 ```
 
 
@@ -48,7 +48,7 @@ GRNs are directed graphs $(V,E)$, which are equivalent to an adjacency matrix.
 
 .pull-right[
 ```{r, out.width = "400px"}
-knitr::include_graphics("image2.png")
+knitr::include_graphics("Image2.png")
 ```
 ]
 
@@ -64,7 +64,7 @@ class:left
 The typical kind of data to learn GRNs is **gene expression data**, which are direct or indirect counts of mRNA.
 .center[
 ```{r, out.width = "150px"}
-knitr::include_graphics("image3.png")
+knitr::include_graphics("Image3.png")
 ```
 ]
 Mostly, we have observational data, not experimental.
@@ -76,7 +76,7 @@ Mostly, we have observational data, not experimental.
 .pull-right[
 
 ```{r, out.width = "800px"}
-knitr::include_graphics("image4.png")
+knitr::include_graphics("Image4.png")
 ```
 ]
 
@@ -182,7 +182,7 @@ Estimators of what? **A Bayesian Network associated to a causal SEM**.
 
 .center[
 ```{r, out.width = "200px"}
-knitr::include_graphics("image5.png")
+knitr::include_graphics("Image5.png")
 ```
 ]
 .Small[
@@ -198,7 +198,7 @@ The joint distribution of noise variables $\epsilon_i$ determines a joint distri
 
 .center[
 ```{r, out.width = "150px"}
-knitr::include_graphics("image6.png")
+knitr::include_graphics("Image6.png")
 ```
 ]
 .Small[
@@ -256,7 +256,7 @@ class:left
 ]
 .center[
 ```{r, out.width = "460px"}
-knitr::include_graphics("image7.png")
+knitr::include_graphics("Image7.png")
 ```
 
 ]
@@ -281,7 +281,7 @@ Sub-network extracted from "gold standard" GRN from Sisi Ma *et al.* (2014), usi
 .center[
 
 ```{r, out.width = "550px"}
-knitr::include_graphics("image8.png")
+knitr::include_graphics("Image8.png")
 ```
 
 
@@ -384,7 +384,7 @@ Over all thresholds, we get a parametric curve - the ROC curve. The area under i
 .pull-right[
 
 ```{r, out.width = "1000px"}
-knitr::include_graphics("image9.png")
+knitr::include_graphics("Image9.png")
 ```
 
 ]
@@ -400,7 +400,7 @@ class:left
 class:center
 
 ```{r, out.width = "800px"}
-knitr::include_graphics("image10.png")
+knitr::include_graphics("Image10.png")
 ```
 
 
@@ -409,7 +409,7 @@ knitr::include_graphics("image10.png")
 class:center
 
 ```{r, out.width = "800px"}
-knitr::include_graphics("image11.gif")
+knitr::include_graphics("Image11.gif")
 ```
 
 
