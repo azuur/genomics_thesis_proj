@@ -2,7 +2,7 @@
 title: "Assessment of Gene Regulatory Network Inference Algorithms Using Monte Carlo Simulations"
 author: "Adrián Zuur and Liliana López-Kleine"
 institute: "Department of Statistics, UNAL-Bogotá"
-date: "July 19, 2019"
+date: "August 4, 2019"
 output:
   xaringan::moon_reader:
     css: ['default', 'default-fonts', 'hygge', 'AZUUR.css']
@@ -21,18 +21,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
-## What We Are Modeling
-
-```{r, out.width = "1500px"}
-knitr::include_graphics("Image1.png")
-```
-
-
----
-
-class:left 
-
-## The Mathematical Model
+## The Scientific Model
 
 .pull-left[
 
@@ -58,47 +47,106 @@ knitr::include_graphics("Image2.png")
 
 class:left 
 
-## The Data
 
-.pull-left[
-The typical kind of data to learn GRNs is **gene expression data**, which are direct or indirect counts of mRNA.
-.center[
-```{r, out.width = "150px"}
-knitr::include_graphics("Image3.png")
-```
-]
-Mostly, we have observational data, not experimental.
+## The Theoretical Problem
 
+In bioinformatics there are many methods to build GRNs.
 
+&nbsp;
+&nbsp;
+&nbsp;
 
-]
+--
 
-.pull-right[
+Papers introducing them typically test them on given gene expression datasets. They show that the methods work *in practice*.
 
-```{r, out.width = "800px"}
-knitr::include_graphics("Image4.png")
-```
-]
+&nbsp;
+&nbsp;
+&nbsp;
 
+--
 
----
-
-class:left 
-
-
-## The Statistical Problem
-In bioinformatics there are many methods to build GRNs. 
-
-
-Papers introducing them typically test them on given datasets. They show that the methods work *in practice*.
-
-
-Our question is, *do they work well in theory?*
+Our question is *do they work well in theory?*
 
 - How dependent is a method on shape of regulatory relations, sample size, noise, etc.?
 
 - How reliable is the method? Are reported results flukes?
 
+
+---
+
+class:left
+
+## Statistics 101
+
+A basic example of statistical inference. We have:  
+&nbsp;
+&nbsp;
+  
+```{r, out.width = "900px"}
+knitr::include_graphics("Image0LANET.png")
+```
+  
+--
+&nbsp;
+&nbsp;
+
+We ask: **is our statistic a good (reliable, accurate) estimator of our parameter?**
+
+- Basic probability says $\bar{X_n}$ is accurate.
+- By the Law of Large Numbers, $\bar{X_n}$ is increasingly accurate as $n \to \infty$.
+
+
+---
+
+class:left
+
+
+## The Probabilistic Model
+
+Consider GRN inference algorithms as estimators and look at their statistical properties (unfair).  
+
+--
+
+Estimators of what?
+
+--
+**A Bayesian Network associated to a causal SEM**.  
+
+--
+
+.pull-left[
+#### Causal Structural Equations Model (SEM)
+
+.center[
+```{r, out.width = "200px"}
+knitr::include_graphics("Image5.png")
+```
+]
+.Small[
+Each equation is a causal mechanism.
+
+The joint distribution of noise variables $\epsilon_i$ determines a joint distribution of gene expressions. This is $P_X(x)$.
+]
+]
+
+--
+
+.pull-right[
+
+#### Bayesian Network
+
+.center[
+```{r, out.width = "150px"}
+knitr::include_graphics("Image6.png")
+```
+]
+.Small[
+Assume joint independence of error variables (no unmeasured common causes), and aciclicity (no contemporary causation).
+
+Draw an edge from direct causes to effects. This is a Bayesian Network, **our parameter of interest**.
+]
+]
 
 
 
@@ -168,72 +216,6 @@ For each gene, estimate an ensemble of regression tress (e.g. random forest). Us
 ]
 ]
 ]
----
-
-class:left 
-
-## The Probabilistic Model to Estimate
-.Small[These inference algorithms are heuristics. Consider them as estimators and look at their statistical properties (unfair).
-
-Estimators of what? **A Bayesian Network associated to a causal SEM**.
-]
-.pull-left[
-#### Causal Structural Equations Model (SEM)
-
-.center[
-```{r, out.width = "200px"}
-knitr::include_graphics("Image5.png")
-```
-]
-.Small[
-Each equation is a causal mechanism.
-
-The joint distribution of noise variables $\epsilon_i$ determines a joint distribution of gene expressions. This is $P_X(x)$.
-]
-]
-
-.pull-right[
-
-#### Bayesian Network
-
-.center[
-```{r, out.width = "150px"}
-knitr::include_graphics("Image6.png")
-```
-]
-.Small[
-Assume joint independence of error variables (no unmeasured common causes), and aciclicity (no contemporary causation).
-
-Draw an edge from direct causes to effects. This is a Bayesian Network, **our parameter of interest**.
-]
-]
-
----
-
-class:left
-
-
-## Side Note: On Causal Bayesian Networks
-
-
-A Bayesian Network is related to the distribution $P_X(x)$ by a graphical notion called **d-separation**.
-
-d-separation implies conditional statistical independence.
-
-$$
-X\perp_dY|Z \implies X\perp Y|Z
-$$
-
-Under an arguably weak condition, **faithfulness**, the converse also holds:
-
-$$
-X\perp Y|Z \implies X\perp_dY|Z
-$$
-
-In this case, the skeleton of the BN (that is, the undirected network it induces naturally) is identified. Estimation is possible but computationally complex.
-
-
-
 
 
 ---
@@ -245,11 +227,11 @@ class:left
 
 .left-column[
 .Small[
-1. Extract 50 node sub-network from "gold standard" *S. cerevisiae* GRN.
+1. Set theoretical network to estimate.
 
 2. Generate causal SEMs over this network.
 
-3. For each causal SEM, simulate 1000 datasets of size 20, 50, 100, and 500. Apply algorithms on datasets.
+3. Simulate data and apply algorithms.
 
 4. Evaluate algorithm outputs.
 ]
@@ -295,20 +277,23 @@ class:left
 
 ## Causal SEM Definition
 
-Eight cases, fixed coefficients $\alpha_{ij} \sim U(-1,1)$ throughout.
 
-
-.pull-left[
-* Functional form
+* Linear functional form
 
 $$f_i\left(pa\left(X_i\right), \varepsilon_i \right)=\sum_{X_j \in pa(X_i)} \alpha_{ij}X_j + \varepsilon_i$$
 
+--
 
-$$f_i\left(pa\left(X_i\right),  \varepsilon_i\right)=2\sigma\left( \sum_{X_j \in pa(X_i)} \alpha_{ij} X_j \right)-1 + \varepsilon_i$$
+* Gaussian errors
 
 
+$$
+\varepsilon_{ij}\sim N(0,\sigma^2)
+$$
 
-* Levels of noise
+--
+
+* Low and high levels of noise
 
 $$
 FVU_i=\frac{Var(\varepsilon_i)}{Var(X_i)}=0.2
@@ -319,43 +304,44 @@ $$
 FVU_i=\frac{Var(\varepsilon_i)}{Var(X_i)}=0.8
 $$
 
-]
+--
+
+Fixed coefficients $\alpha_{ij} \sim U(-1,1)$ throughout.
 
 
-.pull-right[
-
-* Distribution of error terms
 
 
-$$
-\varepsilon_{ij}\sim N(0,\sigma^2)
-$$
 
-$$
-\varepsilon_{ij}\sim U(-b,b)
-$$
-
-]
 
 
 ---
 
 class:left
 
-## Estimation
+## Simulations
+
+* For each causal SEM we simulate 1000 datasets of size 20, 50, 100, and 500.
+
+--
 
 * Algorithms are used "out-of-the-box", that is, using parameters suggested by authors.
 
-* Implementations by authors + reputable packages. NARROMI was translated from Matlab to R code.
+--
 
-* Mutual information was estimated with Miller-Madow estimator. Entropies and cross-entropies are estimated via maximum likelihood with discretized variables, plugged into definition of $I(X,Y)$, and a bias correction term is added.
+* Implementations in trustworthy packages. NARROMI was translated from Matlab to R code.
 
+--
+
+* Mutual information was estimated with Miller-Madow estimator.
+
+.Small[
 $$\hat{H(}X)= - \sum_{b_X \in \text{bins}_X}\hat{p}_{b_X}\log\left(\hat{p}_{b_X}\right)$$
 $$\hat{H(}Y)= - \sum_{b_Y \in \text{bins}_Y}\hat{p}_{b_Y}\log\left(\hat{p}_{b_Y}\right)$$
 
 $$\hat{H(X,Y)}= - \sum_{b_{X \times Y} \in \text{bins}_{X\times Y}}\hat{p}_{b_{X\times Y}}\log\left(\hat{p}_{b_{X\times Y}}\right)$$
 
 $$\hat{I(}X,Y)= \hat{H(}X)+\hat{H(}Y)-\hat{H(}X,Y) + \frac{\hat{m}-1}{n}$$
+]
 
 ---
 
@@ -451,7 +437,30 @@ class:left
 
 ## References
 
+.Small[.Small[
+.pull-left[
+Sisi Ma et al. «De-Novo Learning of Genome-Scale Regulatory Networks in S. cerevisiae».  PLOS ONE 9.9 (2014), pages. 1-20. doi: 10.1371/journal.pone.0106479. url: https://doi.org/10.1371/journal.pone.0106479.
 
+Xiujun Zhang et al. «NARROMI: a noise and redundancy reduction technique improves accuracy of gene regulatory network inference».  Bioinformatics 29.1 (2013), pages. 106-113. issn: 1367-4803. doi: 10.1093/bioinformatics/bts619.
 
+Xin Fang et al. «Global transcriptional regulatory network for Escherichia coli robustly connects gene expression to transcription factor activities».  Proceedings of the National Academy of Sciences (2017). issn: 0027-8424. doi: 10.1073/pnas.1702581114. 
 
+Anne-Claire Haury et al. «TIGRESS: Trustful Inference of Gene REgulation using Stability Selection».  BMC Systems Biology 6.1 (2012), pág. 145. issn: 1752-0509. doi: 10.1186/1752-0509-6-145.
+
+Emmert-Streib F, Dehmer M, Haibe-Kains B. «Gene regulatory networks and their applications: understanding biological and medical problems in terms of networks». Front Cell Dev Biol. (2014) 2:38. doi:10.3389/fcell.2014.00038 
+]
+
+.pull-right[
+Atul J Butte e Isaac S. Kohane. «Mutual information relevance networks: functional genomic clustering using pairwise entropy measurements.»  Pacific Symposium on Biocomputing. Pacific Symposium on Biocomputing (2000), pages. 418-29.
+
+Vân Anh Huynh-Thu et al. «Inferring Regulatory Networks from Expression Data Using Tree-Based Methods».  PLOS ONE 5.9 (2010), pages 1-10. doi: 10.1371/journal.pone.0012776.
+
+Adam A. Margolin et al. «ARACNE: An Algorithm for the Reconstruction of Gene Regulatory Networks in a Mammalian Cellular Context».  BMC Bioinformatics 7 (2006), S7 -S7.
+
+Jeremiah J Faith et al. «Large-Scale Mapping and Validation of Escherichia coli Transcriptional Regulation from a Compendium of Expression Profiles».  PLOS Biology 5.1 (2007), pages. 1-13. doi: 10.1371/journal.pbio.0050008
+
+J. Peters, D. Janzing y B. Schölkopf. Elements of Causal Inference: Foundations and Learning Algorithms. Cambridge, MA, USA: MIT Press, (2017).
+]
+]
+]
 
