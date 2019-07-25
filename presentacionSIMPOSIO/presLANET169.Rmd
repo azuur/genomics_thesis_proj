@@ -110,9 +110,24 @@ Consider GRN inference algorithms as estimators and look at their statistical pr
 --
 
 Estimators of what?
+&nbsp;
+&nbsp;
+  
+```{r, out.width = "900px"}
+knitr::include_graphics("Image2LANET.png")
+```
 
---
-**A Bayesian Network associated to a causal SEM**.  
+---
+
+class:left
+
+
+## The Probabilistic Model
+
+Consider GRN inference algorithms as estimators and look at their statistical properties (unfair).  
+
+
+Estimators of what? **A Bayesian Network associated to a causal SEM**.  
 
 --
 
