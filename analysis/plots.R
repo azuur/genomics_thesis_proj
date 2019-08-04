@@ -16,7 +16,9 @@
 
 require(here)
 source("pckgs_and_useful_wrappers.R")
-
+require(ggthemes)
+require(RColorBrewer)
+require(gganimate)
 
 graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
   #"SC_10","SC_20",
@@ -340,7 +342,14 @@ for(k in seq_along(sample_size_options)){
 
 df_plot <- do.call(rbind,df_list_plot)
 
-dfp<-df_plot %>% 
+levels(df_plot$algorithm) <- 
+  toupper(gsub("_mm", "", levels(df_plot$algorithm)))
+
+dfp<-df_plot %>%
+  # mutate(algorithm = ifelse(algorithm == "ARACNE_mm","ARACNE",algorithm)) %>%
+  # mutate(algorithm = ifelse(algorithm == "MRNET_mm","MRNET",algorithm)) %>%
+  # mutate(algorithm = ifelse(algorithm == "mI_mm","MutInf",algorithm)) %>%
+  # mutate(algorithm = ifelse(algorithm == "CLR_mm","CLR",algorithm)) %>% 
   #  filter(sample_size != 500) %>%
   left_join(
     df_plot %>% 
@@ -349,7 +358,9 @@ dfp<-df_plot %>%
       dplyr::summarize(pos = max(mean_AUROC))
   ) %>%
   arrange(pos) %>%
-  mutate(algorithm = factor(algorithm,levels = unique(algorithm))) %>%
+  mutate(algorithm = factor(algorithm,levels = unique(algorithm)))
+
+dfp <- dfp %>%
   left_join(
     dfp %>%
       group_by(algorithm,sample_size) %>%
@@ -357,40 +368,64 @@ dfp<-df_plot %>%
       ungroup()
   )
 
+dfp <- dfp %>% 
+  rename(AUROC = mean_AUROC, 
+         Algorithm = algorithm,
+         `Sample Size` = sample_size,
+         FVU = r) 
+
 plot_AUROC <-
-  ggplot(dfp, aes(x=algorithm, 
-                  y = mean_AUROC, 
-                  color = sample_size, shape = r
-                  #color = r, shape = sample_size
+  ggplot(dfp, aes(x=Algorithm, 
+                  y = AUROC, 
+                  color = `Sample Size`, shape = FVU
                   )
          ) +
-  theme_minimal() +
+  theme_bw() + 
+  scale_color_brewer(palette="Dark2") +
   geom_point(size = 2.5, position = position_dodge(width = 0.5)) +
   geom_errorbar(
     aes(ymin = p10_AUROC, ymax = p90_AUROC),
-    alpha = 0.3,
+    alpha = 0.7,
     width = 0.3,
     size = 0.5, position = position_dodge(width = 0.5)) +
-  # geom_segment(
-  #   aes(x=algorithm,
-  #       xend=algorithm,
-  #       y=y,
-  #       yend=yend), 
-  #   color="black") +
-  coord_flip() 
+  coord_flip() + 
+  labs(color = "Sample Size",
+       shape = "Frac. of Var. Unexplained",
+       caption = "Dots represent means. Bars range between quantiles 0.1 and 0.9. All are estimated with 1000 simulated datasets.") + 
+#  theme(legend.position="bottom") + 
+  ggtitle("Distributions of AUROC",
+          "Multivariate normal model over 50 node subgraph") + 
+  theme(
+    plot.title = element_text(size = 16),
+    plot.subtitle = element_text(size = 14),
+    plot.caption = element_text(size = 12)
+  )
 
-plot_AUROC
+
+animated_AUROC <-
+  plot_AUROC +
+  transition_states(`Sample Size`, 
+                    state_length = 50,
+                    wrap = TRUE) +
+  shadow_mark(alpha=alpha/4) 
+
+animated_AUROC <- 
+  animated_AUROC %>% 
+  animate(fps = 1, width = 1103*0.7,height = 881*0.7, units = "px")
+
+
 
 plot_path <- file.path("/media","adrian","bodega","thesis",
                        "Robjects","analysis",
                        "plots")
 
-ggsave(file.path(plot_path,"AUROCs"), plot_AUROC, device = "png")
+ggsave(file.path(plot_path,"AUROCs"), plot_AUROC, device = "png",
+       width = 1103/37,height = 881/37, units = "cm")
+anim_save(file.path(plot_path,"anim_AUROCs"), animated_AUROC)
 
 
 
-
-
+3520*881/1103
 
 
 
