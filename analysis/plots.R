@@ -478,10 +478,7 @@ ggpubr::ggarrange(plot_AUROC_REG,
 
 
 
-
-
-
-  rename(AUROC = mean_AUROC, 
+dfp %>%  rename(AUROC = mean_AUROC, 
          Algorithm = algorithm,
          `Sample Size` = sample_size,
          FVU = r) 
