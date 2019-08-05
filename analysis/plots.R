@@ -267,8 +267,12 @@ for(alg in seq_along(algoritmos)){
 
 
 
-overall_results_path <- file.path("/media","adrian","bodega","thesis",
-                                  "Robjects","analysis","summaries")
+# overall_results_path <- file.path("/media","adrian","bodega","thesis",
+#                                   "Robjects","analysis","summaries")
+
+# C:\Users\ASUS PC\Documents\summaries
+
+overall_results_path <- file.path("C:","Users","ASUS PC","Documents","summaries")
 
 df_eval_measures_global <- readRDS(file.path(overall_results_path,"df_eval_measures_global.RDS"))
 
@@ -323,8 +327,13 @@ plot_AUROC <-
 
 
 
-overall_results_path <- file.path("/media","adrian","bodega","thesis",
-                                  "Robjects","analysis","summaries")
+# overall_results_path <- file.path("/media","adrian","bodega","thesis",
+#                                   "Robjects","analysis","summaries")
+
+# C:\Users\ASUS PC\Documents\summaries
+
+overall_results_path <- file.path("C:","Users","ASUS PC","Documents","summaries")
+
 
 df_eval_measures_global <- readRDS(file.path(overall_results_path,"df_eval_measures_global.RDS"))
 
@@ -351,26 +360,49 @@ dfp<-df_plot %>%
   arrange(pos) %>%
   mutate(algorithm = factor(algorithm,levels = unique(algorithm))) %>%
   left_join(
-    dfp %>%
+    df_plot %>%
       group_by(algorithm,sample_size) %>%
       summarize(y = min(mean_AUROC), yend = max(mean_AUROC)) %>%
       ungroup()
   )
 
-plot_AUROC <-
-  ggplot(dfp, aes(x=algorithm, 
+dfp <- dfp %>% 
+  rename(`Sample Size` = sample_size, FVU = r) %>% 
+  mutate(algorithm = ifelse(algorithm=="mi_mm", "MUT INF",algorithm))%>% 
+  mutate(algorithm = ifelse(algorithm=="CLR_mm", "CLR",algorithm))%>% 
+  mutate(algorithm = ifelse(algorithm=="MRNET_mm", "MRNET",algorithm))%>% 
+  mutate(algorithm = ifelse(algorithm=="ARACNE_mm", "ARACNE",algorithm))
+
+
+mutinf <- c("ARACNE","CLR","MRNET", "MUT INF")
+
+plot_AUROC_MI <-
+  ggplot(dfp %>% 
+           filter(algorithm %in% mutinf) %>% arrange(pos), 
+         aes(x=algorithm, 
                   y = mean_AUROC, 
-                  color = sample_size, shape = r
+                  color = `Sample Size`, shape = FVU
                   #color = r, shape = sample_size
                   )
          ) +
-  theme_minimal() +
-  geom_point(size = 2.5, position = position_dodge(width = 0.5)) +
+  theme_bw() +
+  ylim(c(0.5,1)) +
+  theme(plot.title = element_text(size = rel(1.4), face = "bold"),
+        plot.subtitle = element_text(size = rel(1.4)),
+        legend.title=element_text(size=rel(1.2)), 
+        legend.text=element_text(size=rel(1.2)),
+        axis.text.y = element_text(size = rel(1.8)),
+        axis.text.x = element_text(size = rel(1.5))) +
+  geom_point(size = 4, position = position_dodge(width = 1)) +
   geom_errorbar(
     aes(ymin = p10_AUROC, ymax = p90_AUROC),
-    alpha = 0.3,
-    width = 0.3,
-    size = 0.5, position = position_dodge(width = 0.5)) +
+    alpha = 1,
+    width = 0.5,
+    size = 1.5, position = position_dodge(width = 1)) + 
+  scale_color_discrete(name = "Sample Size") +
+  scale_shape_discrete(name = "Frac. of Var. Unexplained") +
+  labs(x= "", y = "AUROC", title ="AUROC for Mutual Information-based Algorithms",
+       subtitle = "Sample averages & bars between quantiles 0.1 and 0.9")+
   # geom_segment(
   #   aes(x=algorithm,
   #       xend=algorithm,
@@ -379,7 +411,52 @@ plot_AUROC <-
   #   color="black") +
   coord_flip() 
 
-plot_AUROC
+plot_AUROC_MI
+
+
+
+plot_AUROC_REG <-
+  ggplot(dfp %>% 
+           filter(!algorithm %in% mutinf) %>% arrange(pos), 
+         aes(x=algorithm, 
+             y = mean_AUROC, 
+             color = `Sample Size`, shape = FVU
+             #color = r, shape = sample_size
+         )
+  ) +
+  theme_bw() +
+  ylim(c(0.5,1)) +
+  theme(plot.title = element_text(size = rel(1.4), face = "bold"),
+        plot.subtitle = element_text(size = rel(1.4)),
+        legend.title=element_text(size=rel(1.2)), 
+        legend.text=element_text(size=rel(1.2)),
+        axis.text.y = element_text(size = rel(1.8)),
+        axis.text.x = element_text(size = rel(1.5))) +
+  geom_point(size = 4, position = position_dodge(width = 1)) +
+  geom_errorbar(
+    aes(ymin = p10_AUROC, ymax = p90_AUROC),
+    alpha = 1,
+    width = 0.5,
+    size = 1.5, position = position_dodge(width = 1)) + 
+  scale_color_discrete(name = "Sample Size") +
+  scale_shape_discrete(name = "Frac. of Var. Unexplained") +
+  labs(x= "", y = "AUROC", title ="AUROC for Regression-based Algorithms",
+       subtitle = "Sample averages & bars between quantiles 0.1 and 0.9")+
+  # geom_segment(
+  #   aes(x=algorithm,
+  #       xend=algorithm,
+  #       y=y,
+  #       yend=yend), 
+  #   color="black") +
+  coord_flip() 
+
+plot_AUROC_REG
+
+
+ggpubr::ggarrange(plot_AUROC_REG,
+                  plot_AUROC_MI, align = "v", nrow= 2, ncol=1
+)
+
 
 plot_path <- file.path("/media","adrian","bodega","thesis",
                        "Robjects","analysis",

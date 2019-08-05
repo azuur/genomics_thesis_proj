@@ -1,5 +1,13 @@
 .small{font-size: 65%}
 
+
+.lowmargs{
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
 .topAZ{margin: 10px;
   position: relative;
   top: 100%;
@@ -21,6 +29,17 @@
 
 
 .Small{font-size: 80%}
+
+@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic); @import url('https://fonts.googleapis.com/css?family=Roboto'); @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+@import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+@import url(https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700);
+
+body { font-family: 'Droid Serif', 'Ubuntu Mono', Roboto, 'Palatino Linotype', 'Book Antiqua', Palatino, 'Microsoft YaHei', 'Songti SC', serif; }
+h1, h2, h3 {
+  font-family: 'Yanone Kaffeesatz';
+  font-weight: normal;
+}
+.remark-code, .remark-inline-code { font-family: 'Source Code Pro', 'Lucida Console', Monaco, monospace; }
 
 
 .shorties{margin-bottom: 0px; margin-top: 0px;}
