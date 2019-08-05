@@ -1,5 +1,13 @@
 .small{font-size: 65%}
 
+.smaller{font-size: 90%}
+
+
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}
 
 .lowmargs{
   padding-top: 10px;

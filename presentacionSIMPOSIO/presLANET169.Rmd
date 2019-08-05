@@ -33,7 +33,7 @@ knitr::include_graphics("Image4.png")
 ---
 
 class:left 
-
+count:false
 
 ## The Theoretical Problem
 
@@ -103,7 +103,7 @@ knitr::include_graphics("Image2LANET.png")
 ```
 
 ---
-
+count:false
 class:left
 
 
@@ -178,7 +178,7 @@ class:left
 
 ## Mutual information-based methods
 
-.Small[
+.smaller[
 .content-box-gray[
 ##### Mutual information network
 Estimate mutual information matrix, threshold.
@@ -196,6 +196,7 @@ Derive 'minimum redundancy, maximum relevance' score from estimated MI.
 ##### CLR
 Standardize estimated MI matrix row-wise and column-wise. Average both scores.
 ]
+
 ]
 
 ---
@@ -204,7 +205,7 @@ class: left
 
 ## Regression-based methods
 
-.Small[
+.smaller[
 .content-box-gray[
 ##### NARROMI
 
@@ -451,7 +452,7 @@ J. Peters, D. Janzing y B. Schölkopf. Elements of Causal Inference: Foundations
 ]
 
 ---
-
+count:false
 class:left 
 
 ## Assessment of Estimates
@@ -480,7 +481,7 @@ knitr::include_graphics("Image9.png")
 
 
 ---
-
+count:false
 class:left 
 
 --
@@ -497,7 +498,7 @@ $$\hat{I(}X,Y)= \hat{H(}X)+\hat{H(}Y)-\hat{H(}X,Y) + \frac{\hat{m}-1}{n}$$
 ]
 
 ---
-
+count:false
 class:center
 
 
@@ -523,7 +524,7 @@ knitr::include_graphics("Image2.png")
 
 
 ---
-
+count:false
 class: center
 
 $$
@@ -534,7 +535,7 @@ $$
 ---
 
 class:left 
-
+count:false
 
 ## Results
 
