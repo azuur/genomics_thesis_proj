@@ -11,8 +11,9 @@ graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
 type_options <- c("linear"#,
                   #"sigmoid"
 )
-noise_options <- c("uniform",
-  "gaussian")
+noise_options <- c(#"uniform",
+  "gaussian",
+  "laplacian")
 
 r_options <- c(0.2,
                #0.5,
@@ -62,7 +63,7 @@ algoritmos <- list(
 
 
 
-eval_measures_cutoff <- list()
+#eval_measures_cutoff <- list()
 eval_measures_global <- list()
 
 for(sample_size in sample_size_options){
@@ -84,160 +85,160 @@ for(sample_size in sample_size_options){
           for(alg in seq_along(algoritmos)){
             
             
-            nets_path <- file.path("/media","adrian","bodega","thesis",
-                                   "Robjects","analysis","thresholded_nets",
-                                   netw_str,
-                                   type,
-                                   paste0(noise,"_noise"),
-                                   paste0(r,"_noise_to_sig"),
-                                   paste0("sample_size_",sample_size)
-            )
-            list_of_nets <- 
-              readRDS(file.path(nets_path,names(algoritmos)[alg],"q90_nets.RDS"))
-            
-            list_of_nets <- lapply(list_of_nets, function(x) x>0)
-            mat <- list_of_nets[[1]]
-            #,ncol= sqrt(length(list_of_nets[[1]])))
-            
-            if(isSymmetric(mat)){
-              A <- (as.matrix(A) + t(as.matrix(A)))/2
-              A_vec <- as.logical(A)
-            }
-            
-            #PPV/precision
-            PPV <- sapply(list_of_nets,
-                          function(x){
-                            sum(x==T & A_vec==1)/sum(x)
-                          })
-            mean_PPV <- mean(PPV)
-            sd_PPV <- sd(PPV)
-            
-            
-            #NPV
-            NPV <- sapply(list_of_nets,
-                          function(x){
-                            sum(x==F & A_vec==0)/sum(1-x)
-                          })
-            mean_NPV <- mean(NPV)
-            sd_NPV <- sd(NPV)
-            
-            
-            
-            #TPR/sensitivity/recall
-            sensitivity <- sapply(list_of_nets,
-                                  function(x){
-                                    sum(x==T & A_vec==1)/sum(A_vec)
-                                  })
-            mean_sensitivity <- mean(sensitivity)
-            sd_sensitivity <- sd(sensitivity)
-            
-            
-            
-            
-            #TNR,specificity, 1-FPR
-            specificity <- sapply(list_of_nets,
-                                  function(x){
-                                    sum(x==F & A_vec==0)/sum(1-A_vec)
-                                  })
-            mean_specificity <- mean(specificity)
-            sd_specificity <- sd(specificity)
-            
-            
-            #F1Score
-            F1 <- 2*PPV*sensitivity/(PPV+sensitivity)
-            mean_F1 <- mean(F1)
-            sd_F1 <- sd(F1)
-            
-            eval_measures_cutoff[[length(eval_measures_cutoff)+1]] <-
-              data.frame(netw = netw_str,
-                         sample_size= sample_size,
-                         r=r,
-                         noise = noise,
-                         type=type,
-                         algorithm=names(algoritmos)[alg],
-                         estimator_cutoff="q90",
-                         mean_PPV = mean_PPV,
-                         sd_PPV = sd_PPV,
-                         mean_NPV = mean_NPV,
-                         sd_NPV = sd_NPV,
-                         mean_sensitivity = mean_sensitivity,
-                         sd_sensitivity = sd_sensitivity,
-                         mean_specificity = mean_specificity,
-                         sd_specificity = sd_specificity,
-                         mean_F1=mean_F1,
-                         sd_F1= sd_F1
-              )
-            
-            
-            list_of_nets <-
-              readRDS(file.path(nets_path,names(algoritmos)[alg],"GS_density_nets.RDS"))
-            
-            list_of_nets <- lapply(list_of_nets, function(x) x>0)
-            mat <- list_of_nets[[1]]
-            
-            #PPV/precision
-            PPV <- sapply(list_of_nets,
-                          function(x){
-                            sum(x==T & A_vec==1)/sum(x)
-                          })
-            mean_PPV <- mean(PPV)
-            sd_PPV <- sd(PPV)
-            
-            
-            #NPV
-            NPV <- sapply(list_of_nets,
-                          function(x){
-                            sum(x==F & A_vec==0)/sum(1-x)
-                          })
-            mean_NPV <- mean(NPV)
-            sd_NPV <- sd(NPV)
-            
-            
-            
-            #TPR/sensitivity/recall
-            sensitivity <- sapply(list_of_nets,
-                                  function(x){
-                                    sum(x==T & A_vec==1)/sum(A_vec)
-                                  })
-            mean_sensitivity <- mean(sensitivity)
-            sd_sensitivity <- sd(sensitivity)
-            
-            
-            
-            
-            #TNR,specificity, 1-FPR
-            specificity <- sapply(list_of_nets,
-                                  function(x){
-                                    sum(x==F & A_vec==0)/sum(1-A_vec)
-                                  })
-            mean_specificity <- mean(specificity)
-            sd_specificity <- sd(specificity)
-            
-            
-            #F1Score
-            F1 <- 2*PPV*sensitivity/(PPV+sensitivity)
-            mean_F1 <- mean(F1)
-            sd_F1 <- sd(F1)
-            
-            eval_measures_cutoff[[length(eval_measures_cutoff)+1]] <-
-              data.frame(netw = netw_str,
-                         sample_size= sample_size,
-                         r=r,
-                         noise = noise,
-                         type=type,
-                         algorithm=names(algoritmos)[alg],
-                         estimator_cutoff="GS_density",
-                         mean_PPV = mean_PPV,
-                         sd_PPV = sd_PPV,
-                         mean_NPV = mean_NPV,
-                         sd_NPV = sd_NPV,
-                         mean_sensitivity = mean_sensitivity,
-                         sd_sensitivity = sd_sensitivity,
-                         mean_specificity = mean_specificity,
-                         sd_specificity = sd_specificity,
-                         mean_F1=mean_F1,
-                         sd_F1= sd_F1
-              )
+            # nets_path <- file.path("/media","adrian","bodega","thesis",
+            #                        "Robjects","analysis","thresholded_nets",
+            #                        netw_str,
+            #                        type,
+            #                        paste0(noise,"_noise"),
+            #                        paste0(r,"_noise_to_sig"),
+            #                        paste0("sample_size_",sample_size)
+            # )
+            # list_of_nets <- 
+            #   readRDS(file.path(nets_path,names(algoritmos)[alg],"q90_nets.RDS"))
+            # 
+            # list_of_nets <- lapply(list_of_nets, function(x) x>0)
+            # mat <- list_of_nets[[1]]
+            # #,ncol= sqrt(length(list_of_nets[[1]])))
+            # 
+            # if(isSymmetric(mat)){
+            #   A <- (as.matrix(A) + t(as.matrix(A)))/2
+            #   A_vec <- as.logical(A)
+            # }
+            # 
+            # #PPV/precision
+            # PPV <- sapply(list_of_nets,
+            #               function(x){
+            #                 sum(x==T & A_vec==1)/sum(x)
+            #               })
+            # mean_PPV <- mean(PPV)
+            # sd_PPV <- sd(PPV)
+            # 
+            # 
+            # #NPV
+            # NPV <- sapply(list_of_nets,
+            #               function(x){
+            #                 sum(x==F & A_vec==0)/sum(1-x)
+            #               })
+            # mean_NPV <- mean(NPV)
+            # sd_NPV <- sd(NPV)
+            # 
+            # 
+            # 
+            # #TPR/sensitivity/recall
+            # sensitivity <- sapply(list_of_nets,
+            #                       function(x){
+            #                         sum(x==T & A_vec==1)/sum(A_vec)
+            #                       })
+            # mean_sensitivity <- mean(sensitivity)
+            # sd_sensitivity <- sd(sensitivity)
+            # 
+            # 
+            # 
+            # 
+            # #TNR,specificity, 1-FPR
+            # specificity <- sapply(list_of_nets,
+            #                       function(x){
+            #                         sum(x==F & A_vec==0)/sum(1-A_vec)
+            #                       })
+            # mean_specificity <- mean(specificity)
+            # sd_specificity <- sd(specificity)
+            # 
+            # 
+            # #F1Score
+            # F1 <- 2*PPV*sensitivity/(PPV+sensitivity)
+            # mean_F1 <- mean(F1)
+            # sd_F1 <- sd(F1)
+            # 
+            # eval_measures_cutoff[[length(eval_measures_cutoff)+1]] <-
+            #   data.frame(netw = netw_str,
+            #              sample_size= sample_size,
+            #              r=r,
+            #              noise = noise,
+            #              type=type,
+            #              algorithm=names(algoritmos)[alg],
+            #              estimator_cutoff="q90",
+            #              mean_PPV = mean_PPV,
+            #              sd_PPV = sd_PPV,
+            #              mean_NPV = mean_NPV,
+            #              sd_NPV = sd_NPV,
+            #              mean_sensitivity = mean_sensitivity,
+            #              sd_sensitivity = sd_sensitivity,
+            #              mean_specificity = mean_specificity,
+            #              sd_specificity = sd_specificity,
+            #              mean_F1=mean_F1,
+            #              sd_F1= sd_F1
+            #   )
+            # 
+            # 
+            # list_of_nets <-
+            #   readRDS(file.path(nets_path,names(algoritmos)[alg],"GS_density_nets.RDS"))
+            # 
+            # list_of_nets <- lapply(list_of_nets, function(x) x>0)
+            # mat <- list_of_nets[[1]]
+            # 
+            # #PPV/precision
+            # PPV <- sapply(list_of_nets,
+            #               function(x){
+            #                 sum(x==T & A_vec==1)/sum(x)
+            #               })
+            # mean_PPV <- mean(PPV)
+            # sd_PPV <- sd(PPV)
+            # 
+            # 
+            # #NPV
+            # NPV <- sapply(list_of_nets,
+            #               function(x){
+            #                 sum(x==F & A_vec==0)/sum(1-x)
+            #               })
+            # mean_NPV <- mean(NPV)
+            # sd_NPV <- sd(NPV)
+            # 
+            # 
+            # 
+            # #TPR/sensitivity/recall
+            # sensitivity <- sapply(list_of_nets,
+            #                       function(x){
+            #                         sum(x==T & A_vec==1)/sum(A_vec)
+            #                       })
+            # mean_sensitivity <- mean(sensitivity)
+            # sd_sensitivity <- sd(sensitivity)
+            # 
+            # 
+            # 
+            # 
+            # #TNR,specificity, 1-FPR
+            # specificity <- sapply(list_of_nets,
+            #                       function(x){
+            #                         sum(x==F & A_vec==0)/sum(1-A_vec)
+            #                       })
+            # mean_specificity <- mean(specificity)
+            # sd_specificity <- sd(specificity)
+            # 
+            # 
+            # #F1Score
+            # F1 <- 2*PPV*sensitivity/(PPV+sensitivity)
+            # mean_F1 <- mean(F1)
+            # sd_F1 <- sd(F1)
+            # 
+            # eval_measures_cutoff[[length(eval_measures_cutoff)+1]] <-
+            #   data.frame(netw = netw_str,
+            #              sample_size= sample_size,
+            #              r=r,
+            #              noise = noise,
+            #              type=type,
+            #              algorithm=names(algoritmos)[alg],
+            #              estimator_cutoff="GS_density",
+            #              mean_PPV = mean_PPV,
+            #              sd_PPV = sd_PPV,
+            #              mean_NPV = mean_NPV,
+            #              sd_NPV = sd_NPV,
+            #              mean_sensitivity = mean_sensitivity,
+            #              sd_sensitivity = sd_sensitivity,
+            #              mean_specificity = mean_specificity,
+            #              sd_specificity = sd_specificity,
+            #              mean_F1=mean_F1,
+            #              sd_F1= sd_F1
+            #   )
             
             roc_path <- file.path("/media","adrian","bodega","thesis",
                                   "Robjects","analysis","ROC_curves",
@@ -286,7 +287,7 @@ for(sample_size in sample_size_options){
                          mean_AUPRC = mean_AUPRC,
                          sd_AUPRC = sd_AUPRC
               )
-            print(length(eval_measures_cutoff))
+            print(length(eval_measures_global))
           }
         }
       }
@@ -294,7 +295,7 @@ for(sample_size in sample_size_options){
   }
 }
 
-df_eval_measures_cutoff <- do.call(rbind, eval_measures_cutoff)
+#df_eval_measures_cutoff <- do.call(rbind, eval_measures_cutoff)
 df_eval_measures_global <- do.call(rbind, eval_measures_global)
 
 
@@ -304,14 +305,14 @@ df_eval_measures_global <- do.call(rbind, eval_measures_global)
 overall_results_path <- file.path("/media","adrian","bodega","thesis",
                                   "Robjects","analysis","summaries")
 dir.create(overall_results_path,showWarnings = F,recursive = T)
-write.table(df_eval_measures_cutoff, 
-            file.path(overall_results_path,"df_eval_measures_cutoff.csv"),
-            row.names = F, sep = ";", dec = ".")
+# write.table(df_eval_measures_cutoff, 
+#             file.path(overall_results_path,"df_eval_measures_cutoff.csv"),
+#             row.names = F, sep = ";", dec = ".")
 write.table(df_eval_measures_global,
             file.path(overall_results_path,"df_eval_measures_global.csv"),
             row.names = F, sep = ";", dec = ".")
-saveRDS(df_eval_measures_cutoff, 
-        file.path(overall_results_path,"df_eval_measures_cutoff.RDS"))
+# saveRDS(df_eval_measures_cutoff, 
+#         file.path(overall_results_path,"df_eval_measures_cutoff.RDS"))
 saveRDS(df_eval_measures_global,
         file.path(overall_results_path,"df_eval_measures_global.RDS"))
 

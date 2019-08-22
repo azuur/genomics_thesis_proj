@@ -9,8 +9,9 @@ graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
 type_options <- c("linear"#,
                   #"sigmoid"
 )
-noise_options <- c("uniform"#,
-  #"gaussian"
+noise_options <- c(#"uniform"#,
+  #"gaussian",
+  "laplacian"
   )
 
 r_options <- c(0.2,

@@ -9,8 +9,9 @@ graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
 type_options <- c("linear"#,
                   #"sigmoid"
                   )
-noise_options <- c("uniform",
-                   "gaussian"
+noise_options <- c(#"uniform",
+                   #"gaussian",
+                   "laplacian"
   )
 
 r_options <- c(0.2,
@@ -92,8 +93,8 @@ for(sample_size in sample_size_options){
           
           ord <- order(as.numeric(gsub("X","",colnames(dat))))
           
-          alg <- 7
-          #or(alg in seq_along(algoritmos)){
+          #alg <- 7
+          for(alg in seq_along(algoritmos)){
             
             list_of_curves <- list()
             
@@ -185,7 +186,7 @@ for(sample_size in sample_size_options){
             
             rm(curve_avg)
             
-          #}
+          }
         }
       }
     }
