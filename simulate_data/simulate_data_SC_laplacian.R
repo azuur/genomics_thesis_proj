@@ -1,6 +1,7 @@
 require(here)
 source("pckgs_and_useful_wrappers.R")
 require(foreach)
+require(rmutil)
 
 #poner opción isnull
 readobj(subdir="Robjects/graph_objects")
@@ -16,32 +17,31 @@ graph_options <- c(#"EC_10","EC_20","EC_50","EC_200",
   #"SC_20",
   "SC_50"#,
   #"SC_200"
-  )
+)
 type_options <- c("linear"#,
                   #"sigmoid"
-                  )
-noise_options <- c("uniform",
-                   "gaussian",
-                   "laplacian")
+)
+noise_options <- c("laplacian")
 r_options <- c(0.2,
                #0.5,
                0.8
-               )
-sample_size_options <- c(20, 50, 100, 500
-                         )#,c(200)#
+)
+sample_size_options <- c(20
+                         , 50, 100, 500
+)#,c(200)#
 n_sim <- 1e3
 
 
 # 
-# netw_str <- graph_options[1]
-# type <- type_options[1]
+netw_str <- graph_options[1]
+type <- type_options[1]
 # noise <- noise_options[1]
 # r <- r_options[2]
 # sample_size <- sample_size_options[1]
 
 
 for(netw_str in graph_options){
-
+  
   seed <- make.seed(netw_str)
   
   str_readobj(netw_str,"Robjects/graph_objects")
@@ -92,14 +92,14 @@ for(netw_str in graph_options){
             
             semilla <- seed/10^ceiling(log(seed,10))
             path <- file.path("/media","adrian","bodega","thesis",
-              "Robjects","simulated_data",
-              netw_str,
-              type,
-              paste0(noise,"_noise"),
-              paste0(r,"_noise_to_sig"),
-              paste0("sample_size_",sample_size)
+                              "Robjects","simulated_data",
+                              netw_str,
+                              type,
+                              paste0(noise,"_noise"),
+                              paste0(r,"_noise_to_sig"),
+                              paste0("sample_size_",sample_size)
             )
-            dir.create(path, showWarnings = F, recursive = T)
+            dir.create(path, showWarnings = T, recursive = T)
             
             
             cl <- parallel::makeForkCluster(3)
@@ -110,18 +110,6 @@ for(netw_str in graph_options){
               # semilla <- 3.7*semilla*(1-semilla)
               # set.seed(semilla)
               
-              if(noise == "uniform"){
-                b <- sqrt(3*vs)
-                errores <- sapply(1:sample_size, 
-                                  function(x)runif(n,min = -b,max = b)
-                ) %>% t()
-              }
-              
-              if(noise == "gaussian"){
-                standdev <- sqrt(vs)
-                errores <- sapply(1:sample_size, 
-                                  function(x)rnorm(n,mean = 0, sd = standdev)) %>% t()
-              }
               
               if(noise == "laplacian"){
                 scaleparam <- sqrt(vs/2)

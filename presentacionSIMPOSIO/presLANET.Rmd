@@ -404,6 +404,32 @@ knitr::include_graphics("RESREG_NO.png")
 
 ---
 
+
+class:lowmargs
+
+```{r, out.width = "850px"}
+knitr::include_graphics("LaplacianMI.png")
+```
+
+
+
+
+---
+
+
+class:lowmargs
+
+```{r, out.width = "850px"}
+knitr::include_graphics("LaplacianREG.png")
+```
+
+
+
+
+---
+
+
+
 class:left 
 
 ## Thanks

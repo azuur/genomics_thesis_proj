@@ -28,7 +28,8 @@ type_options <- c("linear"#,
                   #"sigmoid"
 )
 noise_options <- c(#"uniform",
-  "gaussian")
+  "gaussian",
+  "laplacian")
 
 r_options <- c(0.2,
                #0.5,
@@ -269,12 +270,12 @@ for(alg in seq_along(algoritmos)){
 
 
 
-# overall_results_path <- file.path("/media","adrian","bodega","thesis",
-#                                   "Robjects","analysis","summaries")
+overall_results_path <- file.path("/media","adrian","bodega","thesis",
+                                  "Robjects","analysis","summaries")
 
 # C:\Users\ASUS PC\Documents\summaries
 
-overall_results_path <- file.path("C:","Users","ASUS PC","Documents","summaries")
+# overall_results_path <- file.path("C:","Users","ASUS PC","Documents","summaries")
 
 df_eval_measures_global <- readRDS(file.path(overall_results_path,"df_eval_measures_global.RDS"))
 
@@ -282,7 +283,7 @@ df_list_plot <- list()
 for(k in seq_along(sample_size_options)){
   df_list_plot[[k]] <- 
     df_eval_measures_global %>% 
-    filter(noise == "gaussian", sample_size == sample_size_options[k]) %>%
+    filter(noise == "laplacian", sample_size == sample_size_options[k]) %>%
     filter(r==0.2) %>%
     select(algorithm,sample_size,mean_AUROC,p10_AUROC,p90_AUROC) %>%
     rename(mean_AUROC02 = mean_AUROC,
@@ -290,7 +291,7 @@ for(k in seq_along(sample_size_options)){
            p90_AUROC02 = p90_AUROC) %>%
     left_join(
       df_eval_measures_global %>%
-        filter(noise == "gaussian", sample_size == sample_size_options[k]) %>%
+        filter(noise == "laplacian", sample_size == sample_size_options[k]) %>%
         filter(r==0.8) %>%
         select(algorithm,sample_size,mean_AUROC,p10_AUROC,p90_AUROC) %>%
         rename(mean_AUROC08 = mean_AUROC,
@@ -329,12 +330,12 @@ plot_AUROC <-
 
 
 
-# overall_results_path <- file.path("/media","adrian","bodega","thesis",
-#                                   "Robjects","analysis","summaries")
+overall_results_path <- file.path("/media","adrian","bodega","thesis",
+                                  "Robjects","analysis","summaries")
 
 # C:\Users\ASUS PC\Documents\summaries
 
-overall_results_path <- file.path("C:","Users","ASUS PC","Documents","summaries")
+# overall_results_path <- file.path("C:","Users","ASUS PC","Documents","summaries")
 
 
 df_eval_measures_global <- readRDS(file.path(overall_results_path,"df_eval_measures_global.RDS"))
@@ -344,7 +345,7 @@ df_list_plot <- list()
 for(k in seq_along(sample_size_options)){
   df_list_plot[[k]] <- 
     df_eval_measures_global %>% 
-    filter(noise == "gaussian", sample_size == sample_size_options[k]) %>%
+    filter(noise == "laplacian", sample_size == sample_size_options[k]) %>%
     select(algorithm,sample_size,r,mean_AUROC,p10_AUROC,p90_AUROC) %>%
     mutate(r = as.factor(r), sample_size = as.factor(sample_size))
 }
@@ -412,7 +413,7 @@ plot_AUROC_MI <-
     size = 1.5, position = position_dodge(width = 1)) + 
   scale_color_discrete(name = "Sample Size") +
   scale_shape_discrete(name = "Frac. of Var. Unexplained") +
-  labs(x= "", y = "AUROC", title ="AUROC for Mutual Information-based Algorithms",
+  labs(x= "", y = "AUROC", title ="AUROC for Mutual Information-based Algorithms - Laplacian noise",
        subtitle = "Sample averages & bars between quantiles 0.1 and 0.9")+
   # geom_segment(
   #   aes(x=algorithm,
@@ -451,7 +452,7 @@ plot_AUROC_REG <-
     size = 1.5, position = position_dodge(width = 1)) + 
   scale_color_discrete(name = "Sample Size") +
   scale_shape_discrete(name = "Frac. of Var. Unexplained") +
-  labs(x= "", y = "AUROC", title ="AUROC for Regression-based Algorithms",
+  labs(x= "", y = "AUROC", title ="AUROC for Regression-based Algorithms - Laplacian noise",
        subtitle = "Sample averages & bars between quantiles 0.1 and 0.9")+
   # geom_segment(
   #   aes(x=algorithm,
